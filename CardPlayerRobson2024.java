@@ -36,8 +36,10 @@ public class CardPlayerRobson2024 extends CardPlayer{
         Card queenOfSpades = new Card("Q", "spades", 12);
         Card kingOfSpades  = new Card("K", "spades", 13);
         Card aceOfSpades   = new Card("A", "spades", 14);
-
+//        System.out.println(super.getHand() + "B");
         Collections.sort(super.getHand()); // sort my hand
+//        System.out.println(super.getHand() + "A");
+
         // first check if we have 2 of clubs
         if (specificCardPlay(twoOfClubs) >= 0){
             return this.playCard(specificCardPlay(twoOfClubs));
@@ -49,13 +51,46 @@ public class CardPlayerRobson2024 extends CardPlayer{
             if (playedSuit("spades", game) > 9 && !(game.contains(kingOfSpades) || game.contains(aceOfSpades)) && specificCardPlay(queenOfSpades) >= 0){
                 return this.playCard(specificCardPlay(queenOfSpades));
             }
-            // we want to play low cards but also want to be careful of 
+            // we want to play low cards but also want to be careful of playing a card that people might not be able to follow
+            // I will use a scoring system to see what card I want to play
+            int[] cardScores = new int[super.getHand().size()];
+            int lowestCard = 0;
+            for (int i = 0; i < super.getHand().size(); i++) {
 
-            // final choice is to play a random card
-            return this.playCard(rand.nextInt(super.getHand().size()));
+                // lowest card points
+                cardScores[i] += (100-super.getHand().get(i).getRank()*2);
+                if (super.getHand().get(i).getRank() < super.getHand().get(lowestCard).getRank()){
+                    lowestCard = i;
+                }
+                if (playedSuit(super.getHand().get(i).getSuit(), game) > 11){
+                    cardScores[i] -= 1000;
+                }
+//                // suit points
+//                if (playedSuit(super.getHand().get(i).getSuit(), game) > 8) {
+//                    cardScores[i] += playedSuit(super.getHand().get(i).getSuit(), game);
+//                }
+//                // hearts points
+//                if (super.getHand().get(i).getSuit().equals("hearts")){
+//                    cardScores[i] += 10;
+//                }
+            }
+
+
+            int highestScore = 0;
+            for (int i = 0; i < super.getHand().size(); i++) {
+                if (cardScores[i] > cardScores[highestScore]){
+                    highestScore = i;
+                }
+            }
+            return this.playCard(highestScore);
+
         } // end empty round
 
-        if (playedSuit(round.get(0).getSuit(), super.getHand()) == 0){
+        // first card
+        String followSuit = round.get(0).getSuit();
+        Card followCard = round.get(0);
+
+        if (playedSuit(followSuit, super.getHand()) == 0){
             // we can't follow suit
             
             // we will play the queen of spades if we have it because it is worth 13 points, and we don't want it
@@ -93,14 +128,17 @@ public class CardPlayerRobson2024 extends CardPlayer{
                 if (super.getHand().get(i).getRank() > super.getHand().get(highestCard).getRank()){
                     highestCard = i;
                 }
+                if (playedSuit(super.getHand().get(i).getSuit(), game) > 11){
+                    return this.playCard(i); //  play a card if it is the last card of that suit
+                }
             }
             return this.playCard(highestCard);
             
         }      // we can't follow suit
-        else if (playedSuit(round.get(0).getSuit(), super.getHand()) == 1){
+        else if (playedSuit(followSuit, super.getHand()) == 1){
             // we have only one option of what to play
             for (int i = 0; i < super.getHand().size(); i++) {
-                if (super.getHand().get(i).getSuit().equals(round.get(0).getSuit())){
+                if (super.getHand().get(i).getSuit().equals(followSuit)){
                     return this.playCard(i);
                 }
             }
@@ -113,7 +151,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             int lowestFollowSuit = 100;
             ArrayList<Integer> followCards = new ArrayList<>();
             for (int i = 0; i < super.getHand().size(); i++) {
-                if (super.getHand().get(i).getSuit().equals(round.get(0).getSuit())){
+                if (super.getHand().get(i).getSuit().equals(followSuit)){
                     followCards.add(super.getHand().get(i).getRank());
                     if (super.getHand().get(i).getRank() > highestFollowSuit){
                         highestFollowSuit = super.getHand().get(i).getRank();
@@ -127,7 +165,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             // find the highest card that has been played that follow suit (we can play a card one less than that)
             int highestCardPossible = -1;
             for (Card card : round) {
-                if (card.getSuit().equals(round.get(0).getSuit())) {
+                if (card.getSuit().equals(followSuit)) {
                     if (highestCardPossible < card.getRank()){
                         highestCardPossible = card.getRank();
                     }
@@ -137,7 +175,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             // if our lowest card is above highest card possible we play our highest card of that suit
             if (highestCardPossible < lowestFollowSuit){
                 String[] rankToName = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
-                Card card = new Card(rankToName[highestFollowSuit] , round.get(0).getSuit(), highestFollowSuit);
+                Card card = new Card(rankToName[highestFollowSuit] , followSuit, highestFollowSuit);
                 return this.playCard(specificCardPlay(card));
             }
             
@@ -145,7 +183,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             for (int i = 0; i < followCards.size(); i++) {
                 if (followCards.get(i) < highestCardPossible && i == followCards.size()-1 || followCards.get(i) < highestCardPossible && followCards.get(i+1) > highestCardPossible){
                     String[] rankToName = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
-                    Card card = new Card(rankToName[followCards.get(i)] , round.get(0).getSuit(), followCards.get(i));
+                    Card card = new Card(rankToName[followCards.get(i)] , followSuit, followCards.get(i));
                     return this.playCard(specificCardPlay(card));
                 }
             }
