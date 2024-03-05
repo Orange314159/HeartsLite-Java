@@ -58,13 +58,15 @@ public class CardPlayerRobson2024 extends CardPlayer{
             for (int i = 0; i < super.getHand().size(); i++) {
 
                 // lowest card points
-                cardScores[i] += (100-super.getHand().get(i).getRank()*2);
+                cardScores[i] += (100-super.getHand().get(i).getRank()*2); // add more points to the cards that are lower
                 if (super.getHand().get(i).getRank() < super.getHand().get(lowestCard).getRank()){
-                    lowestCard = i;
+                    lowestCard = i; // set the lowest card
                 }
                 if (playedSuit(super.getHand().get(i).getSuit(), game) > 11){
-                    cardScores[i] -= 1000;
+                    cardScores[i] -= 1000; // if there is only one card left in a suit you will win so don't play that
                 }
+                // at this point in time adding points based on suits or hearts does not have any noticeable improvement so i will not use this code
+                // feel free to use it and tweak the numbers if you think you can get it to help
 //                // suit points
 //                if (playedSuit(super.getHand().get(i).getSuit(), game) > 8) {
 //                    cardScores[i] += playedSuit(super.getHand().get(i).getSuit(), game);
@@ -75,14 +77,14 @@ public class CardPlayerRobson2024 extends CardPlayer{
 //                }
             }
 
-
+            // loop through all of my cards to see which cards have the highest score
             int highestScore = 0;
             for (int i = 0; i < super.getHand().size(); i++) {
                 if (cardScores[i] > cardScores[highestScore]){
                     highestScore = i;
                 }
             }
-            return this.playCard(highestScore);
+            return this.playCard(highestScore); // play the highest score
 
         } // end empty round
 
@@ -91,9 +93,9 @@ public class CardPlayerRobson2024 extends CardPlayer{
         Card followCard = round.get(0);
 
         if (playedSuit(followSuit, super.getHand()) == 0){
-            // we can't follow suit
+            // I can't follow suit
             
-            // we will play the queen of spades if we have it because it is worth 13 points, and we don't want it
+            // I will play the queen of spades if we have it because it is worth 13 points, and we don't want it
             if (specificCardPlay(queenOfSpades) >= 0){
                 return this.playCard(specificCardPlay(queenOfSpades));
             }
@@ -122,7 +124,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             // else leads with it, additionally we would want to play the highest card that we have because we don't want to
             // lead this late in the game (we know it is late in the game because we are unable to follow suit and don't have any
             // hearts either)
-            // FOR NOW I WILL ONLY IMPLEMENT PLAYING OUR HIGHEST CARD 
+            // FOR NOW I WILL ONLY IMPLEMENT PLAYING OUR HIGHEST CARD (and one other slight change)
             int highestCard = 0;
             for (int i = 0; i < super.getHand().size(); i++) {
                 if (super.getHand().get(i).getRank() > super.getHand().get(highestCard).getRank()){
@@ -136,7 +138,7 @@ public class CardPlayerRobson2024 extends CardPlayer{
             
         }      // we can't follow suit
         else if (playedSuit(followSuit, super.getHand()) == 1){
-            // we have only one option of what to play
+            // we have only one option of what to play so that is what we will do
             for (int i = 0; i < super.getHand().size(); i++) {
                 if (super.getHand().get(i).getSuit().equals(followSuit)){
                     return this.playCard(i);
