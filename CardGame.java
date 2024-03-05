@@ -22,10 +22,10 @@ public class CardGame {
         this.deckOfCards = new Deck();
         for (int i = 0; i < numberOfPlayers; i++) {
             if (i % 2 == 1){
-                this.players.add(new CardPlayerLevel2(playerNames[i], 0, new ArrayList<Card>()));
+                this.players.add(new MuellerCardPlayer(playerNames[i], 0, new ArrayList<Card>()));
             }
             else {
-                this.players.add(new CardPlayerLevel1(playerNames[i], 0, new ArrayList<Card>()));
+                this.players.add(new CardPlayerKummaraguntla2024(playerNames[i], 0, new ArrayList<Card>()));
             }
         }
 
@@ -48,18 +48,18 @@ public class CardGame {
     }
 
     private int takesRound(int startPlayer, ArrayList<Card> roundCards){
-        String startSuit = roundCards.get(startPlayer).getSuit();
-        int highCard = roundCards.get(startPlayer).getRank();
-        int ret = startPlayer;
-        for (int i = 0; i < roundCards.size(); i++) {
+        String startSuit = roundCards.get(0).getSuit();
+        int highCard = roundCards.get(0).getRank();
+        int ret = 0;
+        for (int i = 0; i < numberOfPlayers; i++) {
             if (roundCards.get(i).getSuit().equals(startSuit) && highCard <= roundCards.get(i).getRank()){
                 // previous statement essentially checks if the card is the right suit and is a higher value than the
                 // highest already found
-                highCard = roundCards.get(i).getRank();
-                ret = (i + startPlayer) % numberOfPlayers;
+                highCard = roundCards.get((i)).getRank();
+                ret = (i);
             }
         }
-        return ret;
+        return (ret +  4 - startPlayer) % numberOfPlayers;
     }
 
     public ArrayList<Card> playRound(ArrayList<Card> gc){
@@ -67,6 +67,7 @@ public class CardGame {
         Card queenOfSpades = new Card("Q", "spades", 12);
         ArrayList<Card> gameCards = new ArrayList<Card>(gc);
         ArrayList<Card> roundCards = new ArrayList<Card>();
+
         for (int i = 0; i < numberOfPlayers; i++) {
             playerNum = (currentPlayer + i) % numberOfPlayers;
             Card addCard = players.get(playerNum).chooseCard(roundCards, gameCards);
