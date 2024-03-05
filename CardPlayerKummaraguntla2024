@@ -1,0 +1,243 @@
+import java.util.*;
+
+public class CardPlayerKummaraguntla2024 extends CardPlayer{
+
+    public CardPlayerKummaraguntla2024(String name, int score, ArrayList<Card> hand){
+        super(name, score, hand);
+    }
+
+    public Card chooseCard(ArrayList<Card> round, ArrayList<Card> previous){
+
+        Card twoOfClubs = new Card("2", "clubs", 2);
+        Card kingOfSpades  = new Card("K", "spades", 13);
+        Card aceOfSpades   = new Card("A", "spades", 14);
+        Card queenOfSpades = new Card("Q", "spades", 12);
+        boolean b = true;
+        for (int i = 0; i < getHand().size(); i++){
+
+            if (getHand().get(i).equals(twoOfClubs)){
+
+                return playCard(i);
+            }
+        }
+
+        if (b&&round.size()==0){
+            int z = 0;
+            for (int i = 0; i < previous.size(); i++){
+                if (previous.get(i).getSuit()=="spades"){
+                    z++;
+                }
+            }
+            if (getHand().contains(queenOfSpades)){
+                if (z>=10&&!(previous.contains(aceOfSpades)||previous.contains(kingOfSpades))){
+                    return playCard(getIndex(queenOfSpades));
+                }
+            }
+
+            return playCard(min(getHand()));
+
+
+        } else{
+
+            String s = round.get(0).getSuit();
+            ArrayList<Card> sameSuit = new ArrayList<>();
+            for (int i = 0; i < getHand().size(); i++){
+                if (getHand().get(i).getSuit()==s){
+                    sameSuit.add(getHand().get(i));
+                }
+            }
+
+            if (sameSuit.size()>0){
+                return playCard(winningMove(round));
+
+            }
+
+            ArrayList<Card> allHearts = new ArrayList<>();
+
+            for (int i = 0; i < getHand().size(); i++){
+                if (getHand().get(i).getSuit()=="hearts"){
+                    allHearts.add(getHand().get(i));
+                }
+            }
+
+            int w = (int)(Math.random()*(getHand().size()));
+            int numDiamonds = 0;
+            for (Card c: getHand()){
+                if (c.getSuit().equals("diamonds")){
+                    numDiamonds += 1;
+                }
+            }
+
+            if (sameSuit.size()==0){
+                Card kingS = new Card("K", "spades", 13);
+                Card aceS = new Card("A", "spades", 14);
+                Card queenS = new Card("Q", "spades", 12);
+                if (getHand().contains(queenS)) {
+                    return playCard(getIndex(queenS));
+                } else if (getHand().indexOf(kingS) != -1) {
+                    return playCard(getIndex(kingS));
+                } else if (getHand().indexOf(aceS) != -1) {
+                    return playCard(getIndex(aceS));
+                } else if (allHearts.size()>0){
+                    return playCard(max(allHearts));
+                } else if (numDiamonds>0){
+                    ArrayList<Card> hello = new ArrayList<>();
+                    for (int i = 0; i < getHand().size(); i++){
+                        if ((getHand().get(i).getSuit().equals("diamonds"))){
+                            hello.add(getHand().get(i));
+                        }
+                    }
+                    return playCard(max(hello));
+
+                }
+
+                else {
+                    return playCard(max(getHand()));
+                }
+            }
+
+            return null;
+        }
+
+    }
+
+    public int getIndex(Card card){
+        for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).equals(card)){
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public int max(ArrayList<Card> dek){
+        ArrayList<Card> h = dek;
+        int high = 0;
+        int cardToPlay = 0;
+        for (int i = 0; i < h.size(); i++){
+            int count = 0;
+            for (int j = 0; j < h.size(); j++){
+                if ((h.get(i).compareTo(h.get(i)))>0){
+                    count += 1;
+                }
+            }
+            if (count>high){
+                high = count;
+                cardToPlay = i;
+            }
+        }
+        return cardToPlay;
+    }
+
+    public int min(ArrayList<Card> dek){
+        ArrayList<Card> h = dek;
+        int high = 0;
+        int cardToPlay = 0;
+        for (int i = 0; i < h.size(); i++){
+            int count = 0;
+            for (int j = 0; j < h.size(); j++){
+                if ((h.get(i).compareTo(h.get(j)))<0){
+                    count += 1;
+                }
+            }
+            if (count>high){
+                high = count;
+                cardToPlay = i;
+            }
+        }
+        return cardToPlay;
+    }
+
+    public int winningMove(ArrayList<Card> round){
+        int perf = 0;
+        String followSuit = round.get(0).getSuit();
+        int z = max(round);
+        Card q = round.get(z);
+
+        ArrayList<Card> sameSuit = new ArrayList<>();
+        for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).getSuit().equals(followSuit)){
+                sameSuit.add(getHand().get(i));
+            }
+        }
+        Collections.sort(sameSuit);
+        for (int i = sameSuit.size()-1; i >= 0; i--){
+            if(sameSuit.get(i).compareTo(q)<0){
+                perf = i;
+                break;
+            }
+        }
+        for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).equals(sameSuit.get(perf))){
+                return i;
+            }
+        }
+        return max(getHand());
+    }
+
+/*
+   public int winningMove(ArrayList<Card> round){
+      Card c = round.get(0);
+      int perf = 0;
+      ArrayList<Card> viable = new ArrayList<>();
+      if (c.getSuit()=="clubs"){
+         for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).getSuit()=="clubs"){
+               viable.add(getHand().get(i));
+            }
+         }
+         Collections.sort(viable);
+         for (int i = viable.size()-1; i >= 0; i--){
+            if(viable.get(i).compareTo(c)<0){
+               perf = i;
+               break;
+            }
+         }
+      }else if (c.getSuit()=="spades"){
+         for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).getSuit()=="spades"){
+               viable.add(getHand().get(i));
+            }
+         }
+         Collections.sort(viable);for (int i = viable.size()-1; i >= 0; i--){
+            if(viable.get(i).compareTo(c)<0){
+               perf = i;
+               break;
+            }
+         }
+      }else if (c.getSuit()=="hearts"){
+         for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).getSuit()=="hearts"){
+               viable.add(getHand().get(i));
+            }
+         }Collections.sort(viable);for (int i = viable.size()-1; i >= 0; i--){
+            if(viable.get(i).compareTo(c)<0){
+               perf = i;
+               break;
+            }
+         }
+      }else if (c.getSuit()=="diamonds"){
+         for (int i = 0; i < getHand().size(); i++){
+            if (getHand().get(i).getSuit()=="diamonds"){
+               viable.add(getHand().get(i));
+            }
+         }Collections.sort(viable);for (int i = viable.size()-1; i >= 0; i--){
+            if(viable.get(i).compareTo(c)<0){
+               perf = i;
+               break;
+            }
+         }
+      }else{
+         return 0;
+      }
+
+      for (int i = 0; i < getHand().size(); i++){
+         if (getHand().get(i).equals(viable.get(perf))){
+            return i;
+         }
+       }
+      return 0;
+   }
+    */
+
+}
